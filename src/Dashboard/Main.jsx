@@ -29,7 +29,10 @@ const Main = () => {
                         <BsChevronDown className="text-gray-500 text-[12px]" />
                     </div>
                 </div>
-                <div>
+                <div className='flex justify-between flex-wrap my-4'>
+                    <Card />
+                    <Card />
+                    <Card />
                     <Card />
                 </div>
             </div>
