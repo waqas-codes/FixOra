@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { 
+  LayoutDashboard, 
+  ClipboardList, 
+  Users, 
+  UserCheck, 
+  BarChart, 
+  FileText, 
+  Activity, 
+  CheckCircle, 
+  Circle, 
+  Star,
+  LogOut,
+  ChevronLeft,
+  Wrench,
+  User
+} from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -56,11 +72,11 @@ const AdminDashboard = () => {
   });
 
   const menuItems = [
-    { id: 'overview', label: 'Dashboard' },
-    { id: 'requests', label: 'Service Requests' },
-    { id: 'workers', label: 'Workers' },
-    { id: 'assign', label: 'Assign Jobs' },
-    { id: 'analytics', label: 'Analytics' },
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'requests', label: 'Requests', icon: ClipboardList },
+    { id: 'workers', label: 'Workers', icon: Users },
+    { id: 'assign', label: 'Assign Job', icon: UserCheck },
+    { id: 'analytics', label: 'Analytics', icon: BarChart },
   ];
 
   const handleAddWorker = (e) => {
@@ -73,10 +89,10 @@ const AdminDashboard = () => {
 
   // Dynamic Stats
   const stats = [
-    { label: 'Total Requests', value: requests.length },
-    { label: 'Pending Requests', value: requests.filter(r => r.status === 'Pending').length },
-    { label: 'Active Workers', value: workers.length },
-    { label: 'Completed Jobs', value: requests.filter(r => r.status === 'Completed').length },
+    { label: 'Total Requests', value: requests.length, icon: FileText },
+    { label: 'Pending Requests', value: requests.filter(r => r.status === 'Pending').length, icon: Activity },
+    { label: 'Active Workers', value: workers.length, icon: Users },
+    { label: 'Completed Jobs', value: requests.filter(r => r.status === 'Completed').length, icon: CheckCircle },
   ];
 
   // Render components based on active tab
@@ -86,15 +102,16 @@ const AdminDashboard = () => {
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
-                  </div>
-                  <span className="text-green-500 text-sm font-medium bg-gray-100 dark:bg-gray-700 shadow-inner px-2 py-0.5 rounded-full">
-                    Active
+              <div key={idx} className="bg-gray-100 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
+                <div>
+                  <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
+                  <span className="text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
+                    +12.5%
                   </span>
+                </div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-tr from-pink-500 to-orange-400 shadow-lg shadow-orange-500/20">
+                  <stat.icon size={20} className="text-white" />
                 </div>
               </div>
             ))}
@@ -118,10 +135,20 @@ const AdminDashboard = () => {
                   {requests.map((req) => (
                     <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">{req.user?.name || "Unknown User"}</p>
-                        <p className="text-[10px] text-slate-500">{req.date}</p>
+                        <div className="flex items-center gap-2">
+                          <User size={16} className="text-gray-400" />
+                          <div>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">{req.user?.name || "Unknown User"}</p>
+                            <p className="text-[10px] text-slate-500">{req.date}</p>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.serviceType}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <Wrench size={14} className="text-gray-400" />
+                          {req.serviceType}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <select
                           value={req.status}
@@ -218,8 +245,16 @@ const AdminDashboard = () => {
                 <tbody className="space-y-2">
                   {workers.map((worker) => (
                     <tr key={worker.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{worker.name}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{worker.skill}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white flex items-center gap-2">
+                        <User size={16} className="text-gray-400" />
+                        {worker.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <Wrench size={14} className="text-gray-400" />
+                          {worker.skill}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <span className={`flex items-center gap-1.5 text-xs font-medium ${worker.availability === 'Available' ? 'text-green-500' : 'text-amber-500'
                           }`}>
@@ -301,11 +336,12 @@ const AdminDashboard = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full bg-gray-200 text-left px-4 py-4 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
+              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
                 ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-white shadow-none'
                 }`}
             >
+              <item.icon size={18} className={activeTab === item.id ? 'text-indigo-600' : 'text-gray-500 dark:text-gray-400'} />
               {item.label}
             </button>
           ))}
@@ -314,9 +350,9 @@ const AdminDashboard = () => {
           <Link
             to="/signin"
             onClick={() => localStorage.removeItem("user")}
-            className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-red-500 transition-colors px-4"
+            className="flex items-center gap-3 text-sm font-bold text-slate-400 hover:text-red-500 transition-colors px-4"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            <LogOut size={18} />
             Sign Out
           </Link>
         </div>
@@ -353,9 +389,9 @@ const AdminDashboard = () => {
         <div className="p-6 max-w-7xl mx-auto">
           <Link
             to="/"
-            className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
           >
-            <span className="transition-transform group-hover:-translate-x-1">←</span>
+            <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             <span>Back to Home</span>
           </Link>
           <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
