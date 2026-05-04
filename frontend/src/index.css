@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: 'Poppins', 'Inter', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 75px;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 dark:bg-[#0b0f19] dark:bg-gradient-to-br dark:from-[#0b0f19] dark:to-black min-h-screen text-slate-900 dark:text-gray-100 antialiased font-sans transition-colors duration-300;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-white/5 backdrop-blur-md border border-slate-200/50 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 dark:hover:from-indigo-400 dark:hover:to-purple-400 text-white font-medium py-2 px-6 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] dark:shadow-[0_0_15px_rgba(99,102,241,0.5)] dark:hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] hover:scale-105 active:scale-95;
+  }
+}
