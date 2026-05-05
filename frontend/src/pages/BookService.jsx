@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
 
 const BookService = () => {
@@ -11,6 +11,13 @@ const BookService = () => {
     description: ''
   });
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.serviceType) {
+      setFormData(prev => ({ ...prev, serviceType: location.state.serviceType }));
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

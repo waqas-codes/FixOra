@@ -6,6 +6,8 @@ const ServiceRequest = require('../models/ServiceRequest');
 const createRequest = async (req, res) => {
   const { serviceType, date, location, workersRequired, description } = req.body;
 
+  console.log(req);
+
   if (!serviceType || !date || !location || !workersRequired || !description) {
     return res.status(400).json({ message: 'Please add all fields' });
   }
@@ -78,7 +80,7 @@ const assignWorker = async (req, res) => {
 
   request.assignedWorker = req.body.workerName;
   request.status = 'Assigned';
-  
+
   const updatedRequest = await request.save();
   res.json(updatedRequest);
 };

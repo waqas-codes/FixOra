@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Services from '../components/Services';
 import HowItWorks from '../components/HowItWorks';
@@ -9,6 +9,13 @@ import CTA from '../components/CTA';
 import Footer from '../components/Footer';
 
 function Navbar() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("user"); // Using "user" as it contains the token
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/");
+  };
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -38,8 +45,8 @@ function Navbar() {
 
         {/* Links */}
         <div className="hidden md:flex items-center space-x-8">
-          <a 
-            href="#home" 
+          <a
+            href="/home"
             onClick={(e) => {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -55,16 +62,25 @@ function Navbar() {
 
         {/* Button & Toggle */}
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => setIsDark(!isDark)}
             className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Toggle Dark Mode"
           >
             {isDark ? '☀️' : '🌙'}
           </button>
-          <Link to="/signin" className="btn-primary hover:scale-105 active:scale-95 transition-transform duration-300">
-            Sign In
-          </Link>
+          {token ? (
+            <button
+              onClick={handleLogout}
+              className="btn-primary hover:scale-105 active:scale-95 transition-transform duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/signin" className="btn-primary hover:scale-105 active:scale-95 transition-transform duration-300">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>

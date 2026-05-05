@@ -17,6 +17,7 @@ const Dashboard = () => {
       setLoading(true);
       const { data } = await api.get('/requests/my');
       setRequests(data);
+      console.log(data);
     } catch (error) {
       console.error('Error fetching requests:', error);
     } finally {
@@ -57,7 +58,7 @@ const Dashboard = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case 'dashboard':
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat, idx) => (
@@ -68,7 +69,8 @@ const Dashboard = () => {
             ))}
           </div>
         );
-      case 'my-requests':
+      case 'requests':
+        console.log('Rendering requests:', requests);
         return (
           <div className="bg-white dark:bg-[#151c2c] rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
             {requests.length > 0 ? (
@@ -85,15 +87,14 @@ const Dashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {requests.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{req.serviceType}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.date}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          req.status === 'In Progress' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' :
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'In Progress' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' :
                           req.status === 'Assigned' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' :
-                          'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
-                        }`}>
+                            'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
+                          }`}>
                           {req.status}
                         </span>
                       </td>
@@ -152,15 +153,15 @@ const Dashboard = () => {
                               <form onSubmit={(e) => handleReviewSubmit(e, req.id)} className="space-y-2 py-2">
                                 <div className="flex items-center gap-2">
                                   <label className="text-[10px] font-bold uppercase text-slate-400">Rating:</label>
-                                  <select 
-                                    value={rating} 
+                                  <select
+                                    value={rating}
                                     onChange={(e) => setRating(Number(e.target.value))}
                                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded px-1 py-0.5 text-xs outline-none"
                                   >
-                                    {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                                    {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Stars</option>)}
                                   </select>
                                 </div>
-                                <textarea 
+                                <textarea
                                   value={comment}
                                   onChange={(e) => setComment(e.target.value)}
                                   placeholder="Your feedback..."
@@ -173,7 +174,7 @@ const Dashboard = () => {
                                 </div>
                               </form>
                             ) : (
-                              <button 
+                              <button
                                 onClick={() => setReviewingId(req.id)}
                                 className="px-4 py-1.5 border border-indigo-500 text-indigo-500 text-[10px] font-bold uppercase rounded-lg hover:bg-indigo-500 hover:text-white transition-all"
                               >
@@ -201,24 +202,24 @@ const Dashboard = () => {
             <form className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Full Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   defaultValue="John Customer"
                   className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Email Address</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   defaultValue="john@example.com"
                   className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Phone Number</label>
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   defaultValue="+1 (555) 000-0000"
                   className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
                 />
@@ -249,19 +250,18 @@ const Dashboard = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold ${
-                activeTab === item.id
-                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                  : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400'
-              }`}
+              className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold ${activeTab === item.id
+                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400'
+                }`}
             >
               {item.label}
             </button>
           ))}
         </nav>
         <div className="pt-6 border-t border-slate-100 dark:border-white/5">
-          <Link 
-            to="/signin" 
+          <Link
+            to="/signin"
             onClick={() => localStorage.removeItem("user")}
             className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-red-500 transition-colors px-4"
           >
@@ -282,14 +282,13 @@ const Dashboard = () => {
         </div>
         <div className="flex overflow-x-auto gap-2 px-4 pb-3 no-scrollbar">
           {menuItems.map(item => (
-            <button 
+            <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${
-                activeTab === item.id 
-                  ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20' 
-                  : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
-              }`}
+              className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${activeTab === item.id
+                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
+                }`}
             >
               {item.label}
             </button>
@@ -300,8 +299,8 @@ const Dashboard = () => {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0f19]">
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
           >
             <span className="transition-transform group-hover:-translate-x-1">←</span>

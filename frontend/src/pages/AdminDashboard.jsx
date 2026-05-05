@@ -20,6 +20,7 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       const { data } = await api.get('/requests');
+      console.log('Admin requests data:', data);
       setRequests(data);
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -108,9 +109,9 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {requests.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">Customer</p>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">{req.user?.name || "Unknown User"}</p>
                         <p className="text-[10px] text-slate-500">{req.date}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.serviceType}</td>

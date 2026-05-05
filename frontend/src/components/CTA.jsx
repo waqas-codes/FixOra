@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const CTA = () => {
   return (
@@ -15,9 +16,12 @@ const CTA = () => {
           <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
             Join thousands of happy customers who trust FixOra for their home and service needs. Get started now in just a few clicks.
           </p>
-          <button className="bg-white text-indigo-600 font-bold py-4 px-10 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] text-lg">
+          <Link 
+            to="/book-service"
+            className="bg-white text-indigo-600 font-bold py-4 px-10 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] text-lg inline-block"
+          >
             Book Now
-          </button>
+          </Link>
         </div>
       </div>
     </section>

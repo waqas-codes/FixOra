@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -76,9 +77,13 @@ const Services = () => {
             <div className="p-6 flex flex-col flex-grow">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{service.title}</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow text-sm">{service.description}</p>
-              <button className="w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 hover:scale-105 active:scale-95 text-sm">
+              <Link 
+                to="/book-service" 
+                state={{ serviceType: service.title }}
+                className="w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 hover:scale-105 active:scale-95 text-sm text-center"
+              >
                 Book Now
-              </button>
+              </Link>
             </div>
           </div>
         ))}

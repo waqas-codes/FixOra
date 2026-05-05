@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -108,12 +109,13 @@ const Hero = () => {
           Experience precision-engineered service delivery. From electrical repairs to professional carpentry, we connect you with verified experts in minutes.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <button
+          <Link
+            to="/book-service"
             ref={btn1Ref}
-            className="btn-primary w-full sm:w-auto"
+            className="btn-primary w-full sm:w-auto text-center"
           >
             Book a Pro Now
-          </button>
+          </Link>
           <button
             ref={btn2Ref}
             className="glass hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white font-medium py-2 px-6 rounded-full transition-all duration-300 w-full sm:w-auto hover:scale-105 active:scale-95"

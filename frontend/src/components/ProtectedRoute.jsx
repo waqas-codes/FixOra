@@ -6,9 +6,9 @@ const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem("user");
 
   // If no user is found, redirect to the sign-in page
-  // if (!user) {
-  //   return <Navigate to="/signin" replace />;
-  // }
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
 
   // If user exists, allow access to the protected route
   return children;
