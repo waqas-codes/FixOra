@@ -62,8 +62,8 @@ const Dashboard = () => {
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">{stat.label}</p>
+              <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+                <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
               </div>
             ))}
@@ -72,11 +72,11 @@ const Dashboard = () => {
       case 'requests':
         console.log('Rendering requests:', requests);
         return (
-          <div className="bg-white dark:bg-[#151c2c] rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
             {requests.length > 0 ? (
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
+                  <tr className="bg-gray-200 dark:bg-gray-700/50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service Type</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Date</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
@@ -85,7 +85,7 @@ const Dashboard = () => {
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="">
                   {requests.map((req) => (
                     <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{req.serviceType}</td>
@@ -120,18 +120,18 @@ const Dashboard = () => {
       case 'history':
         const completedRequests = requests.filter(r => r.status === 'Completed');
         return (
-          <div className="bg-white dark:bg-[#151c2c] rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
             {completedRequests.length > 0 ? (
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
+                  <tr className="bg-gray-200 dark:bg-gray-700/50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service Type</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Date</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Worker</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Review</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="">
                   {completedRequests.map((req) => (
                     <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{req.serviceType}</td>
@@ -156,7 +156,7 @@ const Dashboard = () => {
                                   <select
                                     value={rating}
                                     onChange={(e) => setRating(Number(e.target.value))}
-                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded px-1 py-0.5 text-xs outline-none"
+                                    className="bg-gray-50 dark:bg-gray-700 shadow-sm rounded px-1 py-0.5 text-xs outline-none"
                                   >
                                     {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Stars</option>)}
                                   </select>
@@ -165,7 +165,7 @@ const Dashboard = () => {
                                   value={comment}
                                   onChange={(e) => setComment(e.target.value)}
                                   placeholder="Your feedback..."
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded-lg p-2 text-xs outline-none resize-none"
+                                  className="w-full bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg p-2 text-xs outline-none resize-none"
                                   rows="2"
                                 />
                                 <div className="flex gap-2">
@@ -197,7 +197,7 @@ const Dashboard = () => {
         );
       case 'profile':
         return (
-          <div className="max-w-xl bg-white dark:bg-[#151c2c] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+          <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
             <h3 className="text-lg font-bold mb-6 text-slate-900 dark:text-white">Profile Information</h3>
             <form className="space-y-4">
               <div>
@@ -205,7 +205,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   defaultValue="John Customer"
-                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
               <div>
@@ -213,7 +213,7 @@ const Dashboard = () => {
                 <input
                   type="email"
                   defaultValue="john@example.com"
-                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
               <div>
@@ -221,10 +221,10 @@ const Dashboard = () => {
                 <input
                   type="tel"
                   defaultValue="+1 (555) 000-0000"
-                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
-              <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20">
+              <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:shadow-md transition-all duration-200 shadow-sm">
                 Update Profile
               </button>
             </form>
@@ -236,9 +236,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-white transition-colors duration-500 font-sans">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-200 dark:bg-gray-900 text-slate-900 dark:text-white transition-all duration-300 font-sans">
       {/* Sidebar - Desktop Only */}
-      <aside className="hidden md:flex w-64 bg-white dark:bg-[#151c2c] border-r border-slate-200 dark:border-white/5 p-6 flex-col shrink-0">
+      <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
           <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-1">
             <span className="text-slate-900 dark:text-white">Fix</span>
@@ -250,9 +250,9 @@ const Dashboard = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold ${activeTab === item.id
-                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400'
+              className={`bg-gray-200 dark:bg-gray-700/50  w-full text-left px-4 py-4 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
+                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-white shadow-none'
                 }`}
             >
               {item.label}
@@ -272,7 +272,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Mobile Header - Full menu accessibility */}
-      <div className="md:hidden sticky top-0 z-50 bg-white dark:bg-[#151c2c] border-b border-slate-100 dark:border-white/5">
+      <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
           <Link to="/" className="text-lg font-bold tracking-tight">
             <span className="text-slate-900 dark:text-white">Fix</span>
@@ -297,8 +297,8 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0f19]">
-        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <main className="flex-1 overflow-y-auto bg-gray-200 dark:bg-gray-900 transition-all duration-300">
+        <div className="p-6 max-w-7xl mx-auto">
           <Link
             to="/"
             className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
@@ -306,7 +306,7 @@ const Dashboard = () => {
             <span className="transition-transform group-hover:-translate-x-1">←</span>
             <span>Back to Home</span>
           </Link>
-          <header className="mb-8 md:mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
                 {menuItems.find(m => m.id === activeTab)?.label}

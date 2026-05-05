@@ -86,20 +86,27 @@ const AdminDashboard = () => {
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
+              <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
+                  </div>
+                  <span className="text-green-500 text-sm font-medium bg-gray-100 dark:bg-gray-700 shadow-inner px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         );
       case 'requests':
         return (
-          <div className="bg-white dark:bg-[#151c2c] rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
             {requests.length > 0 ? (
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
+                  <tr className="bg-gray-50 dark:bg-gray-700/50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Customer</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
@@ -107,7 +114,7 @@ const AdminDashboard = () => {
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="space-y-2">
                   {requests.map((req) => (
                     <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4">
@@ -116,14 +123,14 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.serviceType}</td>
                       <td className="px-6 py-4">
-                        <select 
+                        <select
                           value={req.status}
                           disabled={req.status === 'Completed'}
                           onChange={(e) => {
                             updateStatus(req.id, e.target.value);
                             alert('Status updated successfully');
                           }}
-                          className={`bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded-lg text-[10px] font-bold px-2 py-1 outline-none ${req.status === 'Completed' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg text-[10px] font-bold px-2 py-1 outline-none ${req.status === 'Completed' ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <option value="Pending">Pending</option>
                           <option value="In Progress">In Progress</option>
@@ -135,8 +142,8 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <select 
-                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded-lg text-[10px] px-2 py-1 outline-none"
+                          <select
+                            className="bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg text-[10px] px-2 py-1 outline-none"
                             onChange={(e) => {
                               assignWorker(req.id, e.target.value);
                               alert('Worker assigned successfully');
@@ -162,27 +169,27 @@ const AdminDashboard = () => {
         );
       case 'workers':
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Add Worker Form */}
-            <div className="max-w-xl bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+            <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
               <h3 className="text-sm font-bold mb-4 uppercase tracking-widest text-indigo-500">Add New Worker</h3>
               <form onSubmit={handleAddWorker} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={workerForm.name}
-                    onChange={(e) => setWorkerForm({...workerForm, name: e.target.value})}
+                    onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
                     placeholder="Worker Name"
-                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none text-xs"
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-xs"
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Skill</label>
-                  <select 
+                  <select
                     value={workerForm.skill}
-                    onChange={(e) => setWorkerForm({...workerForm, skill: e.target.value})}
-                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none text-xs"
+                    onChange={(e) => setWorkerForm({ ...workerForm, skill: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-xs"
                   >
                     <option value="">Select Skill</option>
                     <option value="Electrician">Electrician</option>
@@ -192,31 +199,30 @@ const AdminDashboard = () => {
                     <option value="Cleaner">Cleaner</option>
                   </select>
                 </div>
-                <button type="submit" className="bg-indigo-500 text-white font-bold py-2.5 rounded-xl hover:bg-indigo-600 transition-all text-xs shadow-lg shadow-indigo-500/20">
+                <button type="submit" className="bg-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs">
                   Add Worker
                 </button>
               </form>
             </div>
 
             {/* Workers List */}
-            <div className="bg-white dark:bg-[#151c2c] rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
-              <table className="w-full text-left border-collapse">
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] p-5 transition-all duration-300 overflow-hidden">
+              <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
+                  <tr className="bg-gray-200 dark:bg-gray-700/50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Worker Name</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Skill</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Availability</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="space-y-2">
                   {workers.map((worker) => (
                     <tr key={worker.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{worker.name}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{worker.skill}</td>
                       <td className="px-6 py-4">
-                        <span className={`flex items-center gap-1.5 text-xs font-medium ${
-                          worker.availability === 'Available' ? 'text-green-500' : 'text-amber-500'
-                        }`}>
+                        <span className={`flex items-center gap-1.5 text-xs font-medium ${worker.availability === 'Available' ? 'text-green-500' : 'text-amber-500'
+                          }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${worker.availability === 'Available' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
                           {worker.availability}
                         </span>
@@ -230,25 +236,25 @@ const AdminDashboard = () => {
         );
       case 'assign':
         return (
-          <div className="max-w-xl bg-white dark:bg-[#151c2c] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+          <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
             <h3 className="text-lg font-bold mb-6">Assign New Job</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-2">Select Request</label>
-                <select className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm">
+                <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
                   <option>John Doe - Electrical (Pending)</option>
                   <option>Sarah Wilson - Painting (Pending)</option>
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-2">Select Worker</label>
-                <select className="w-full p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 text-sm">
+                <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
                   <option>Robert Fox (Electrician)</option>
                   <option>Jenny Wilson (Cleaner)</option>
                   <option>Albert Flores (Painter)</option>
                 </select>
               </div>
-              <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20">
+              <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
                 Assign Job
               </button>
             </div>
@@ -257,20 +263,20 @@ const AdminDashboard = () => {
       case 'analytics':
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Total Earnings</p>
+            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+              <p className="text-sm text-gray-500 font-medium mb-1">Total Earnings</p>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$12,450.00</h3>
               <p className="text-xs text-green-500 mt-2 font-medium">↑ 12% from last month</p>
             </div>
-            <div className="bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Jobs Completed</p>
+            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+              <p className="text-sm text-gray-500 font-medium mb-1">Jobs Completed</p>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">842</h3>
-              <p className="text-xs text-slate-500 mt-2 font-medium">Average 28 jobs / week</p>
+              <p className="text-xs text-gray-500 mt-2 font-medium">Average 28 jobs / week</p>
             </div>
-            <div className="bg-white dark:bg-[#151c2c] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Worker Performance</p>
+            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+              <p className="text-sm text-gray-500 font-medium mb-1">Worker Performance</p>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">94%</h3>
-              <p className="text-xs text-blue-500 mt-2 font-medium">Customer satisfaction rate</p>
+              <p className="text-xs text-green-500 mt-2 font-medium">Customer satisfaction rate</p>
             </div>
           </div>
         );
@@ -280,9 +286,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-white transition-colors duration-500 font-sans">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-200 dark:bg-gray-900 text-slate-900 dark:text-white transition-all duration-300 font-sans">
       {/* Sidebar - Desktop Only */}
-      <aside className="hidden md:flex w-64 bg-white dark:bg-[#151c2c] border-r border-slate-200 dark:border-white/5 p-6 flex-col shrink-0">
+      <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
           <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-1">
             <span className="text-slate-900 dark:text-white">Fix</span>
@@ -295,19 +301,18 @@ const AdminDashboard = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold ${
-                activeTab === item.id
-                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                  : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400'
-              }`}
+              className={`w-full bg-gray-200 text-left px-4 py-4 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
+                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-white shadow-none'
+                }`}
             >
               {item.label}
             </button>
           ))}
         </nav>
-        <div className="pt-6 border-t border-slate-100 dark:border-white/5">
-          <Link 
-            to="/signin" 
+        <div className="pt-6 mt-auto">
+          <Link
+            to="/signin"
             onClick={() => localStorage.removeItem("user")}
             className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-red-500 transition-colors px-4"
           >
@@ -318,7 +323,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden sticky top-0 z-50 bg-white dark:bg-[#151c2c] border-b border-slate-100 dark:border-white/5">
+      <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
           <Link to="/" className="text-lg font-bold tracking-tight">
             <span className="text-slate-900 dark:text-white">Fix</span>
@@ -329,14 +334,13 @@ const AdminDashboard = () => {
         </div>
         <div className="flex overflow-x-auto gap-2 px-4 pb-3 no-scrollbar">
           {menuItems.map(item => (
-            <button 
+            <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${
-                activeTab === item.id 
-                  ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20' 
-                  : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
-              }`}
+              className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${activeTab === item.id
+                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
+                }`}
             >
               {item.label}
             </button>
@@ -345,16 +349,16 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0f19]">
-        <div className="p-4 md:p-8 max-w-7xl mx-auto">
-          <Link 
-            to="/" 
+      <main className="flex-1 overflow-y-auto bg-gray-200 dark:bg-gray-900 transition-all duration-300">
+        <div className="p-6 max-w-7xl mx-auto">
+          <Link
+            to="/"
             className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
           >
             <span className="transition-transform group-hover:-translate-x-1">←</span>
             <span>Back to Home</span>
           </Link>
-          <header className="mb-8 md:mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
                 {menuItems.find(m => m.id === activeTab)?.label}
