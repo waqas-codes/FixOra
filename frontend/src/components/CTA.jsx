@@ -14,7 +14,7 @@ const CTA = () => {
             Ready to book your service?
           </h2>
           <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Join thousands of happy customers who trust FixOra for their home and service needs. Get started now in just a few clicks.
+            Join thousands of happy customers who trust Local Service Agency for their home and service needs. Get started now in just a few clicks.
           </p>
           <Link 
             to="/book-service"

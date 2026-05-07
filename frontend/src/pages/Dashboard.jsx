@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import api from '../services/api';
 import {
   LayoutDashboard,
@@ -77,7 +78,7 @@ const Dashboard = () => {
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="bg-gray-100 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
+              <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
                 <div>
                   <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
@@ -279,9 +280,8 @@ const Dashboard = () => {
       {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
-          <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-1">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-indigo-500">Ora</span>
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
           </Link>
         </div>
         <nav className="flex-1 space-y-1.5">
@@ -314,9 +314,8 @@ const Dashboard = () => {
       {/* Mobile Header - Full menu accessibility */}
       <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
-          <Link to="/" className="text-lg font-bold tracking-tight">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-indigo-500">Ora</span>
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Local Service Agency" className="h-8 object-contain" />
           </Link>
           <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[10px] font-bold">JC</div>
         </div>

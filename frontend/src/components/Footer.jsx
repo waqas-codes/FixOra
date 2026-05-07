@@ -7,9 +7,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Column 1: Brand */}
           <div className="space-y-6">
-            <div className="text-2xl font-bold tracking-tight">
-              <span className="text-slate-900 dark:text-white">Fix</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">Ora</span>
+            <div className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Local Service Agency
             </div>
             <p className="text-sm leading-relaxed max-w-xs">
               Connecting you with trusted professionals for all your home service needs. Experience precision and reliability.
@@ -48,7 +47,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                support@fixora.com
+                support@localservice.com
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -61,7 +60,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs">
-            © 2026 <span className="font-bold">FixOra</span>. All rights reserved.
+            © 2026 <span className="font-bold">Local Service Agency</span>. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-indigo-500 transition-colors">

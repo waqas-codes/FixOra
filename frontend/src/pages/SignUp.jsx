@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import api from '../services/api';
 
 const SignUp = () => {
@@ -46,12 +47,11 @@ const SignUp = () => {
         </Link>
         {/* Header */}
         <div className="text-center mb-6">
-          <Link to="/" className="inline-block text-xl font-bold tracking-tight mb-4">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-gradient">Ora</span>
+          <Link to="/" className="inline-block mb-4">
+            <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Create an Account</h1>
-          <p className="text-sm text-slate-500 dark:text-gray-400">Sign up to get started with FixOra.</p>
+          <p className="text-sm text-slate-500 dark:text-gray-400">Sign up to get started with Local Service Agency.</p>
         </div>
 
         {/* Role Toggle */}

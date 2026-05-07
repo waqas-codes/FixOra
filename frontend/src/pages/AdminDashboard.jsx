@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import api from '../services/api';
-import { 
-  LayoutDashboard, 
-  ClipboardList, 
-  Users, 
-  UserCheck, 
-  BarChart, 
-  FileText, 
-  Activity, 
-  CheckCircle, 
-  Circle, 
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Users,
+  UserCheck,
+  BarChart,
+  FileText,
+  Activity,
+  CheckCircle,
+  Circle,
   Star,
   LogOut,
   ChevronLeft,
@@ -100,21 +101,103 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="bg-gray-100 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
-                <div>
-                  <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
-                  <span className="text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
-                    +12.5%
-                  </span>
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, idx) => (
+                <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
+                  <div>
+                    <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
+                    <span className="text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
+                      +12.5%
+                    </span>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-tr from-pink-500 to-orange-400 shadow-lg shadow-orange-500/20">
+                    <stat.icon size={20} className="text-white" />
+                  </div>
                 </div>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-tr from-pink-500 to-orange-400 shadow-lg shadow-orange-500/20">
-                  <stat.icon size={20} className="text-white" />
+              ))}
+            </div>
+
+            {/* Analytics & Customers Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Performance Overview */}
+              <div className="lg:col-span-2 bg-gray-200 dark:bg-gray-800 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+                <div className="flex justify-between items-center mb-10">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Performance Overview</h3>
+                  <div className="flex items-center gap-2">
+                    <button className="px-4 py-1.5 text-sm font-semibold bg-gray-200 text-gray-700 rounded-full">Weekly</button>
+                    <button className="px-4 py-1.5 text-sm font-semibold bg-blue-500 text-white rounded-full">Monthly</button>
+                  </div>
+                </div>
+
+                <div className="flex items-end justify-between h-72 px-4 pb-2">
+                  {[
+                    { day: 'MON', height: 'h-28', color: 'bg-indigo-200' },
+                    { day: 'TUE', height: 'h-40', color: 'bg-indigo-200' },
+                    { day: 'WED', height: 'h-36', color: 'bg-indigo-200' },
+                    { day: 'THU', height: 'h-56', color: 'bg-blue-500', active: true },
+                    { day: 'FRI', height: 'h-30', color: 'bg-indigo-200' },
+                    { day: 'SAT', height: 'h-44', color: 'bg-indigo-200' }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-3 w-full">
+                      <div
+                        className={`w-14 ${item.height} ${item.color} rounded-t-2xl transition-all duration-300`}
+                      ></div>
+                      <span className="text-xs font-bold uppercase text-gray-400">{item.day}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+
+              {/* Right Column: Recent Customers & Weekly Goal */}
+              <div className="flex flex-col gap-6">
+                <div className="bg-gray-200 dark:bg-gray-800 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Recent Customers</h3>
+                  <div className="space-y-6">
+                    {[
+                      { name: 'Sarah Jenkins', time: '2 min ago', amount: '+$240', color: 'from-pink-500 to-rose-500' },
+                      { name: 'Michael Chen', time: '15 min ago', amount: '+$180', color: 'from-blue-500 to-cyan-500' },
+                      { name: 'Emma Wilson', time: '1 hour ago', amount: '+$320', color: 'from-purple-500 to-indigo-500' }
+                    ].map((customer, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${customer.color} flex items-center justify-center text-white text-xs font-bold`}>
+                            {customer.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">{customer.name}</p>
+                            <p className="text-[10px] text-gray-500">{customer.time}</p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-bold text-green-600">{customer.amount}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-8 text-center">
+                    <button className="text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                      View All Transactions
+                    </button>
+                  </div>
+                </div>
+
+                {/* Weekly Goal Card */}
+                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20">
+                  <h3 className="text-lg font-bold mb-1">Weekly Goal</h3>
+                  <p className="text-xs text-blue-100 mb-6">Target: 100 requests completed</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-end">
+                      <span className="text-2xl font-bold">75%</span>
+                      <span className="text-[10px] font-bold text-blue-100">75/100</span>
+                    </div>
+                    <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full bg-white rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         );
       case 'requests':
@@ -325,10 +408,9 @@ const AdminDashboard = () => {
       {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
-          <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-1">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-indigo-500">Ora</span>
-            <span className="text-[10px] ml-2 px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 rounded font-bold uppercase tracking-widest">Admin</span>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
+            <span className="text-[10px] px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 rounded font-bold uppercase tracking-widest">Admin</span>
           </Link>
         </div>
         <nav className="flex-1 space-y-1.5">
@@ -361,10 +443,9 @@ const AdminDashboard = () => {
       {/* Mobile Header */}
       <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
-          <Link to="/" className="text-lg font-bold tracking-tight">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-indigo-500">Ora</span>
-            <span className="text-[10px] ml-1 px-1 bg-indigo-500/10 text-indigo-500 rounded uppercase tracking-widest">Admin</span>
+          <Link to="/" className="flex items-center gap-1">
+            <img src={logo} alt="Local Service Agency" className="h-8 object-contain" />
+            <span className="text-[10px] px-1 bg-indigo-500/10 text-indigo-500 rounded uppercase tracking-widest">Admin</span>
           </Link>
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold">AD</div>
         </div>

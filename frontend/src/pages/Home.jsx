@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import Hero from '../components/Hero';
 import Services from '../components/Services';
 import HowItWorks from '../components/HowItWorks';
@@ -37,10 +38,8 @@ function Navbar() {
   return (
     <nav className="fixed w-full top-0 z-50 p-4">
       <div className="max-w-7xl mx-auto glass rounded-2xl px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-bold tracking-tight">
-          <span className="text-slate-900 dark:text-white transition-colors duration-300">Fix</span>
-          <span className="text-gradient">Ora</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Local Service Agency" className="h-12 md:h-14 object-contain" />
         </Link>
 
         {/* Links */}

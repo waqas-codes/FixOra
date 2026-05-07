@@ -17,19 +17,19 @@ function App() {
       
       {/* Protected Routes */}
       <Route path="/admin/dashboard" element={
-        <ProtectedRoute>
+        <ProtectedRoute allowedRole="admin">
           <AdminDashboard />
         </ProtectedRoute>
       } />
       
       <Route path="/dashboard" element={
-        <ProtectedRoute>
+        <ProtectedRoute allowedRole="customer">
           <Dashboard />
         </ProtectedRoute>
       } />
       
       <Route path="/book-service" element={
-        <ProtectedRoute>
+        <ProtectedRoute allowedRole="customer">
           <BookService />
         </ProtectedRoute>
       } />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import api from '../services/api';
 
 const SignIn = () => {
@@ -7,15 +8,21 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) return alert('Please enter your details');
+    setError('');
+    if (!email || !password) return setError('Please enter your details');
 
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      console.log(data);
+      
+      // Role validation
+      if (data.role !== role) {
+        return setError('Unauthorized user');
+      }
 
       // Store complete user data including token
       localStorage.setItem("user", JSON.stringify(data));
@@ -27,7 +34,7 @@ const SignIn = () => {
         navigate('/dashboard');
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Login failed');
+      setError(error.response?.data?.message || 'Login failed');
     }
   };
 
@@ -43,9 +50,8 @@ const SignIn = () => {
         </Link>
         {/* Header */}
         <div className="text-center mb-6">
-          <Link to="/" className="inline-block text-xl font-bold tracking-tight mb-4">
-            <span className="text-slate-900 dark:text-white">Fix</span>
-            <span className="text-gradient">Ora</span>
+          <Link to="/" className="inline-block mb-4">
+            <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Welcome Back</h1>
           <p className="text-sm text-slate-500 dark:text-gray-400">Please enter your details to sign in.</p>
@@ -123,6 +129,8 @@ const SignIn = () => {
             <input type="checkbox" id="remember" className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-500 focus:ring-indigo-500" />
             <label htmlFor="remember" className="ml-2 text-xs text-slate-600 dark:text-gray-400">Keep me logged in</label>
           </div>
+
+          {error && <p className="text-red-500 text-[10px] font-bold ml-1">{error}</p>}
 
           <button type="submit" className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-bold rounded-xl hover:scale-[1.01] active:scale-[0.99] transition-all shadow-lg shadow-indigo-500/20">
             Login
