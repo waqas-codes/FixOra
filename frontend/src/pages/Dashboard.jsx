@@ -138,7 +138,10 @@ const Dashboard = () => {
                       <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <User size={14} className="text-gray-400" />
-                          {req.assignedWorker || "Not Assigned"}
+                          {(req.assignedWorkers?.length > 0)
+                            ? req.assignedWorkers.join(', ')
+                            : (req.assignedWorker || "Not Assigned")
+                          }
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
@@ -181,7 +184,7 @@ const Dashboard = () => {
                     <tr key={req.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">{req.serviceType}</td>
                       <td className="px-6 py-4 text-sm text-slate-600">{new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{req.assignedWorker}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{req.assignedWorkers?.length > 0 ? req.assignedWorkers.join(', ') : (req.assignedWorker || '—')}</td>
                       <td className="px-6 py-4">
                         {req.rating > 0 ? (
                           <div>

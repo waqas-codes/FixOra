@@ -74,16 +74,16 @@ export const RequestProvider = ({ children }) => {
     }
   };
 
-  // Assign worker to request (Admin)
-  const assignWorker = async (id, workerName) => {
+  // Assign workers to request (Admin)
+  const assignWorker = async (id, workerNames) => {
     try {
-      await api.put(`/requests/${id}/assign`, { workerName });
+      await api.put(`/requests/${id}/assign`, { workerNames });
       setRequests((prev) =>
-        prev.map((req) => (req._id === id || req.id === id ? { ...req, assignedWorker: workerName } : req))
+        prev.map((req) => (req._id === id || req.id === id ? { ...req, assignedWorkers: workerNames } : req))
       );
       return { success: true };
     } catch (err) {
-      return { success: false, message: err.response?.data?.message || 'Failed to assign worker' };
+      return { success: false, message: err.response?.data?.message || 'Failed to assign workers' };
     }
   };
 

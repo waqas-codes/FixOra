@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Dashboard from './pages/Dashboard';
 import BookService from './pages/BookService';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
           <BookService />
         </ProtectedRoute>
       } />
+
+      {/* 404 Catch-All Route */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

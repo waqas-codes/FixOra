@@ -59,13 +59,19 @@ const updateStatus = async (req, res) => {
     return res.status(400).json({ message: 'Cannot update a completed request' });
   }
 
-  request.status = req.body.status || request.status;
+  const newStatus = req.body.status || request.status;
+
+  if (newStatus === 'Completed' && (!request.assignedWorkers || request.assignedWorkers.length === 0)) {
+    return res.status(400).json({ message: 'Please assign worker(s) before completing request.' });
+  }
+
+  request.status = newStatus;
   const updatedRequest = await request.save();
 
   res.json(updatedRequest);
 };
 
-// @desc    Assign worker to request
+// @desc    Assign workers to request
 // @route   PUT /api/requests/:id/assign
 // @access  Private/Admin
 const assignWorker = async (req, res) => {
@@ -75,12 +81,23 @@ const assignWorker = async (req, res) => {
     return res.status(404).json({ message: 'Request not found' });
   }
 
-  if (request.assignedWorker) {
-    return res.status(400).json({ message: 'Worker already assigned' });
+  const { workerNames } = req.body;
+
+  // Support both old single workerName and new workerNames array
+  const names = workerNames || (req.body.workerName ? [req.body.workerName] : []);
+
+  if (!names.length) {
+    return res.status(400).json({ message: 'Please provide worker names' });
   }
 
-  request.assignedWorker = req.body.workerName;
-  request.status = 'Assigned';
+  const maxWorkers = request.workersRequired || 1;
+
+  if (names.length > maxWorkers) {
+    return res.status(400).json({ message: `Cannot assign more than ${maxWorkers} workers` });
+  }
+
+  request.assignedWorkers = names;
+  request.status = names.length >= maxWorkers ? 'Assigned' : request.status;
 
   const updatedRequest = await request.save();
   res.json(updatedRequest);

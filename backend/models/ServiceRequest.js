@@ -32,9 +32,9 @@ const serviceRequestSchema = mongoose.Schema(
       enum: ['Pending', 'Assigned', 'In Progress', 'Completed'],
       default: 'Pending',
     },
-    assignedWorker: {
-      type: String,
-      default: '',
+    assignedWorkers: {
+      type: [String],
+      default: [],
     },
     rating: {
       type: Number,

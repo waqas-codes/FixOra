@@ -27,6 +27,7 @@ const AdminDashboard = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [workers, setWorkers] = useState([]);
+  const [workerFilter, setWorkerFilter] = useState('All');
 
   useEffect(() => {
     fetchRequests();
@@ -56,6 +57,12 @@ const AdminDashboard = () => {
   };
 
   const updateStatus = async (id, status) => {
+    if (status === 'Completed') {
+      const req = requests.find(r => (r._id === id || r.id === id));
+      if (!req?.assignedWorkers || req.assignedWorkers.length === 0) {
+        return alert('Please assign worker(s) before completing request.');
+      }
+    }
     try {
       const { data } = await api.put(`/requests/${id}/status`, { status });
       // Update local state instantly with returned data
@@ -67,15 +74,39 @@ const AdminDashboard = () => {
     }
   };
 
-  const assignWorker = async (id, workerName) => {
+  const assignWorkers = async (id, workerNames) => {
     try {
-      const { data } = await api.put(`/requests/${id}/assign`, { workerName });
+      const { data } = await api.put(`/requests/${id}/assign`, { workerNames });
       setRequests(prev => prev.map(req => (req._id === id || req.id === id) ? data : req));
-      console.log('Worker assigned:', workerName);
+      console.log('Workers assigned:', workerNames);
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to assign worker');
+      alert(error.response?.data?.message || 'Failed to assign workers');
       fetchRequests();
     }
+  };
+
+  // Toggle a worker in a request's pending selection
+  const [pendingSelections, setPendingSelections] = useState({});
+
+  const toggleWorkerSelection = (reqId, workerName, maxWorkers) => {
+    setPendingSelections(prev => {
+      const current = prev[reqId] || [];
+      if (current.includes(workerName)) {
+        return { ...prev, [reqId]: current.filter(n => n !== workerName) };
+      }
+      if (current.length >= maxWorkers) {
+        alert(`Maximum ${maxWorkers} worker(s) allowed`);
+        return prev;
+      }
+      return { ...prev, [reqId]: [...current, workerName] };
+    });
+  };
+
+  const confirmAssignment = (reqId) => {
+    const selected = pendingSelections[reqId] || [];
+    if (!selected.length) return alert('Please select at least one worker');
+    assignWorkers(reqId, selected);
+    setPendingSelections(prev => { const copy = { ...prev }; delete copy[reqId]; return copy; });
   };
 
   const [workerForm, setWorkerForm] = useState({
@@ -119,6 +150,7 @@ const AdminDashboard = () => {
   };
 
   const [selectedWorker, setSelectedWorker] = useState(null);
+  const [viewAssignedReq, setViewAssignedReq] = useState(null);
 
   const handleDeleteWorker = async (id) => {
     if (window.confirm("Are you sure you want to delete this worker?")) {
@@ -245,37 +277,45 @@ const AdminDashboard = () => {
         );
       case 'requests':
         return (
-          <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300">
+          <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-4 transition-all duration-300 overflow-x-auto">
             {requests.length > 0 ? (
-              <table className="w-full text-left border-separate border-spacing-y-2">
+              <table className="w-full text-left border-separate border-spacing-y-2 table-fixed min-w-[700px]">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Customer</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Assigned</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[17%]">Customer</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[18%]">Service</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[13%]">Date</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[8%]">Workers</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[13%]">Status</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[14%]">Assigned</th>
+                    <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-[17%]">Action</th>
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
                   {requests.map((req) => (
                     <tr key={req._id || req.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <User size={16} className="text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-slate-900">{req.user?.name || "Unknown User"}</p>
-                            <p className="text-[10px] text-slate-500">{new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
-                          </div>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <User size={16} className="text-gray-400 shrink-0" />
+                          <p className="text-sm font-medium text-slate-900 truncate">{req.user?.name || "Unknown User"}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
-                        <div className="flex items-center gap-2">
-                          <Wrench size={14} className="text-gray-400" />
-                          {req.serviceType}
+                      <td className="px-3 py-3 text-sm text-slate-600">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <Wrench size={14} className="text-gray-400 shrink-0" />
+                          <span className="truncate">{req.serviceType}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 text-sm text-slate-600 whitespace-nowrap">
+                        {new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <Users size={14} className="text-indigo-400 shrink-0" />
+                          <span className="text-sm font-semibold text-slate-700">{req.workersRequired || 1}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3">
                         <select
                           value={req.status}
                           disabled={req.status === 'Completed' || req.status === 'Cancelled'}
@@ -288,21 +328,71 @@ const AdminDashboard = () => {
                           <option value="Cancelled">Cancelled</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-xs font-medium text-slate-500">
-                        {req.assignedWorker || "None"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <select
-                            className="bg-gray-50 shadow-sm rounded-lg text-[10px] px-2 py-1 outline-none"
-                            onChange={(e) => assignWorker(req._id || req.id, e.target.value)}
-                            value={req.assignedWorker || ""}
-                            disabled={req.status === 'Completed' || req.status === 'Cancelled'}
+                      <td className="px-3 py-2 align-top">
+                        {(req.assignedWorkers?.length > 0) ? (
+                          <button
+                            onClick={() => setViewAssignedReq(req)}
+                            className="flex items-center gap-1 text-[10px] font-bold text-indigo-500 hover:text-indigo-700 transition-colors"
                           >
-                            <option value="">Select Worker</option>
-                            {workers.map(w => <option key={w._id || w.id} value={w.name}>{w.name} ({w.skill})</option>)}
-                          </select>
-                        </div>
+                            <Eye size={12} />
+                            View ({req.assignedWorkers.length})
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-slate-400">None</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 align-top">
+                        {(req.status !== 'Completed' && req.status !== 'Cancelled') ? (() => {
+                          const reqId = req._id || req.id;
+                          const isOpen = pendingSelections[reqId] !== undefined;
+                          const selected = pendingSelections[reqId] || req.assignedWorkers || [];
+                          return (
+                            <div className="relative">
+                              <button
+                                onClick={() => {
+                                  if (isOpen) {
+                                    setPendingSelections(prev => { const c = { ...prev }; delete c[reqId]; return c; });
+                                  } else {
+                                    setPendingSelections(prev => ({ ...prev, [reqId]: [...(req.assignedWorkers || [])] }));
+                                  }
+                                }}
+                                className="flex items-center gap-1 bg-gray-50 shadow-sm rounded-md text-[10px] font-bold px-2 py-[3px] text-slate-600 hover:bg-gray-100 transition-colors"
+                              >
+                                <Users size={10} className="text-indigo-400" />
+                                {selected.length}/{req.workersRequired || 1}
+                                <span className="text-[8px] text-slate-400">{isOpen ? '▲' : '▼'}</span>
+                              </button>
+                              {isOpen && (
+                                <div className="absolute z-50 top-full left-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg p-1">
+                                  <div className="max-h-28 overflow-y-auto">
+                                    {workers.map(w => {
+                                      const isChecked = selected.includes(w.name);
+                                      return (
+                                        <label key={w._id || w.id} className="flex items-center gap-1.5 cursor-pointer px-1.5 py-[3px] rounded hover:bg-slate-50 transition-colors">
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => toggleWorkerSelection(reqId, w.name, req.workersRequired || 1)}
+                                            className="accent-indigo-500 w-2.5 h-2.5"
+                                          />
+                                          <span className="text-[10px] text-slate-700 truncate leading-none">{w.name} <span className="text-slate-400">({w.skill})</span></span>
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                  <button
+                                    onClick={() => confirmAssignment(reqId)}
+                                    className="w-full mt-1 bg-indigo-500 text-white text-[9px] font-bold py-[3px] rounded-md hover:bg-indigo-600 transition-colors"
+                                  >
+                                    Confirm
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })() : (
+                          <span className="text-[10px] text-slate-400">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -319,25 +409,25 @@ const AdminDashboard = () => {
         return (
           <div className="space-y-6">
             {/* Add Worker Form */}
-            <div className="max-w-2xl bg-gray-200 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
-              <h3 className="text-sm font-bold mb-5 uppercase tracking-widest text-indigo-500">Add New Worker</h3>
-              <form onSubmit={handleAddWorker} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-end">
+            <div className="max-w-lg bg-gray-200 p-4 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+              <h3 className="text-xs font-bold mb-3 uppercase tracking-widest text-indigo-500">Add New Worker</h3>
+              <form onSubmit={handleAddWorker} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-end">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Name</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Name</label>
                   <input
                     type="text"
                     value={workerForm.name}
                     onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
                     placeholder="Full Name"
-                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                    className="w-full px-3 py-2 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Skill</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Skill</label>
                   <select
                     value={workerForm.skill}
                     onChange={(e) => setWorkerForm({ ...workerForm, skill: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                    className="w-full px-3 py-2 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   >
                     <option value="">Select Skill</option>
                     <option value="Electrician">Electrician</option>
@@ -348,36 +438,36 @@ const AdminDashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Phone Number</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Phone Number</label>
                   <input
                     type="tel"
                     value={workerForm.phone}
                     onChange={(e) => setWorkerForm({ ...workerForm, phone: e.target.value })}
                     placeholder="Phone Number"
-                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                    className="w-full px-3 py-2 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Age</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Age</label>
                   <input
                     type="number"
                     value={workerForm.age}
                     onChange={(e) => setWorkerForm({ ...workerForm, age: e.target.value })}
                     placeholder="Age"
-                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                    className="w-full px-3 py-2 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Address</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Address</label>
                   <input
                     type="text"
                     value={workerForm.address}
                     onChange={(e) => setWorkerForm({ ...workerForm, address: e.target.value })}
                     placeholder="Worker Address"
-                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                    className="w-full px-3 py-2 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   />
                 </div>
-                <button type="submit" className="bg-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs h-[42px]">
+                <button type="submit" className="bg-indigo-500 text-white font-bold py-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs h-[36px]">
                   Add Worker
                 </button>
               </form>
@@ -385,6 +475,24 @@ const AdminDashboard = () => {
 
             {/* Workers List */}
             <div className="bg-gray-200 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] p-5 transition-all duration-300 overflow-hidden">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-slate-800">Worker Directory</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filter:</span>
+                  <select
+                    value={workerFilter}
+                    onChange={(e) => setWorkerFilter(e.target.value)}
+                    className="px-3 py-1.5 bg-gray-100 shadow-[inset_-2px_-2px_4px_rgba(255,255,255,0.8),inset_2px_2px_4px_rgba(0,0,0,0.05)] rounded-lg outline-none text-[11px] text-slate-700 font-bold border border-transparent focus:border-indigo-500/30 transition-all cursor-pointer"
+                  >
+                    <option value="All">All Workers</option>
+                    <option value="Electrician">Electricians</option>
+                    <option value="Plumber">Plumbers</option>
+                    <option value="Mechanic">Mechanics</option>
+                    <option value="Carpenter">Carpenters</option>
+                    <option value="Cleaner">Cleaners</option>
+                  </select>
+                </div>
+              </div>
               <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
                   <tr className="bg-gray-200">
@@ -395,7 +503,7 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
-                  {workers.map((worker) => (
+                  {(workerFilter === 'All' ? workers : workers.filter(w => w.skill === workerFilter)).map((worker) => (
                     <tr key={worker._id || worker.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900 flex items-center gap-2">
                         <User size={16} className="text-gray-400" />
@@ -631,6 +739,57 @@ const AdminDashboard = () => {
                 className="w-full mt-6 py-3 bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-[0.98] text-sm"
               >
                 Close Details
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Assigned Workers View Modal */}
+        {viewAssignedReq && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setViewAssignedReq(null)}>
+            <div className="bg-gray-200 w-full max-w-xs rounded-[1.5rem] p-5 shadow-2xl relative animate-in zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setViewAssignedReq(null)}
+                className="absolute top-4 right-4 p-1 bg-gray-200 text-gray-500 hover:text-red-500 rounded-lg shadow-[-2px_-2px_5px_rgba(255,255,255,0.8),2px_2px_5px_rgba(0,0,0,0.1)] transition-all"
+              >
+                <X size={14} />
+              </button>
+
+              <h3 className="text-sm font-bold text-gray-900 mb-1">Assigned Workers</h3>
+              <p className="text-[10px] text-slate-400 mb-4">
+                {viewAssignedReq.serviceType} • {viewAssignedReq.assignedWorkers?.length}/{viewAssignedReq.workersRequired || 1} assigned
+              </p>
+
+              <div className="space-y-2 max-h-52 overflow-y-auto">
+                {viewAssignedReq.assignedWorkers?.map((name, i) => {
+                  const workerInfo = workers.find(w => w.name === name);
+                  return (
+                    <div key={i} className="bg-gray-200 p-3 rounded-xl shadow-[inset_-2px_-2px_5px_rgba(255,255,255,0.8),inset_2px_2px_5px_rgba(0,0,0,0.1)] flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md shadow-indigo-500/20">
+                        {name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-gray-900 truncate">{name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[9px] text-indigo-500 font-bold uppercase">{workerInfo?.skill || '—'}</span>
+                          {workerInfo?.phone && (
+                            <>
+                              <span className="text-[9px] text-slate-300">•</span>
+                              <span className="text-[9px] text-slate-500">{workerInfo.phone}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setViewAssignedReq(null)}
+                className="w-full mt-4 py-2 bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-[0.98] text-xs"
+              >
+                Close
               </button>
             </div>
           </div>
