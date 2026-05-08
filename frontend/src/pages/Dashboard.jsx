@@ -22,9 +22,14 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [reviewData, setReviewData] = useState({ id: null, rating: 5, comment: '' });
 
   useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
     fetchRequests();
   }, []);
 
@@ -78,11 +83,11 @@ const Dashboard = () => {
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
+              <div key={idx} className="bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
                 <div>
                   <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
-                  <span className="text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
+                  <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+                  <span className="text-green-600 bg-green-100 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
                     +12.5%
                   </span>
                 </div>
@@ -96,11 +101,11 @@ const Dashboard = () => {
       case 'requests':
         console.log('Rendering requests:', requests);
         return (
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
+          <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300">
             {requests.length > 0 ? (
               <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-gray-200 dark:bg-gray-700/50">
+                  <tr className="bg-gray-200">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service Type</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Date</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
@@ -111,32 +116,32 @@ const Dashboard = () => {
                 </thead>
                 <tbody className="">
                   {requests.map((req) => (
-                    <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white flex items-center gap-2">
+                    <tr key={req._id || req.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900 flex items-center gap-2">
                         {req.serviceType}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <Calendar size={14} className="text-gray-400" />
-                          {req.date}
+                          {new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center w-fit gap-1 ${req.status === 'In Progress' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' :
-                          req.status === 'Assigned' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' :
-                            'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center w-fit gap-1 ${req.status === 'In Progress' ? 'bg-blue-100 text-blue-600' :
+                          req.status === 'Assigned' ? 'bg-indigo-100 text-indigo-600' :
+                            'bg-amber-100 text-amber-600'
                           }`}>
                           <Circle size={10} fill="currentColor" />
                           {req.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <User size={14} className="text-gray-400" />
                           {req.assignedWorker || "Not Assigned"}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <MapPin size={14} className="text-gray-400" />
                           {req.location}
@@ -151,7 +156,7 @@ const Dashboard = () => {
               </table>
             ) : (
               <div className="p-20 text-center">
-                <p className="text-slate-500 dark:text-slate-400 font-medium">No requests yet</p>
+                <p className="text-slate-500 font-medium">No requests yet</p>
                 <Link to="/book-service" className="text-indigo-500 text-sm font-bold hover:underline mt-2 inline-block">Book your first service</Link>
               </div>
             )}
@@ -160,11 +165,11 @@ const Dashboard = () => {
       case 'history':
         const completedRequests = requests.filter(r => r.status === 'Completed');
         return (
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
+          <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300">
             {completedRequests.length > 0 ? (
               <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-gray-200 dark:bg-gray-700/50">
+                  <tr className="bg-gray-200">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service Type</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Date</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Worker</th>
@@ -173,10 +178,10 @@ const Dashboard = () => {
                 </thead>
                 <tbody className="">
                   {completedRequests.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{req.serviceType}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.date}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{req.assignedWorker}</td>
+                    <tr key={req.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900">{req.serviceType}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{req.assignedWorker}</td>
                       <td className="px-6 py-4">
                         {req.rating > 0 ? (
                           <div>
@@ -196,7 +201,7 @@ const Dashboard = () => {
                                   <select
                                     value={rating}
                                     onChange={(e) => setRating(Number(e.target.value))}
-                                    className="bg-gray-50 dark:bg-gray-700 shadow-sm rounded px-1 py-0.5 text-xs outline-none"
+                                    className="bg-gray-50 shadow-sm rounded px-1 py-0.5 text-xs outline-none"
                                   >
                                     {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Stars</option>)}
                                   </select>
@@ -205,7 +210,7 @@ const Dashboard = () => {
                                   value={comment}
                                   onChange={(e) => setComment(e.target.value)}
                                   placeholder="Your feedback..."
-                                  className="w-full bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg p-2 text-xs outline-none resize-none"
+                                  className="w-full bg-gray-50 shadow-sm rounded-lg p-2 text-xs outline-none resize-none"
                                   rows="2"
                                 />
                                 <div className="flex gap-2">
@@ -229,7 +234,7 @@ const Dashboard = () => {
                 </tbody>
               </table>
             ) : (
-              <div className="p-20 text-center text-slate-500 dark:text-slate-400 font-medium">
+              <div className="p-20 text-center text-slate-500 font-medium">
                 No completed requests yet
               </div>
             )}
@@ -237,31 +242,31 @@ const Dashboard = () => {
         );
       case 'profile':
         return (
-          <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
-            <h3 className="text-lg font-bold mb-6 text-slate-900 dark:text-white">Profile Information</h3>
+          <div className="max-w-xl bg-gray-200 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+            <h3 className="text-lg font-bold mb-6 text-slate-900">Profile Information</h3>
             <form className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Full Name</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Full Name</label>
                 <input
                   type="text"
                   defaultValue="John Customer"
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Email Address</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Email Address</label>
                 <input
                   type="email"
                   defaultValue="john@example.com"
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Phone Number</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Phone Number</label>
                 <input
                   type="tel"
                   defaultValue="+1 (555) 000-0000"
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-sm"
+                  className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
               <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:shadow-md transition-all duration-200 shadow-sm">
@@ -276,9 +281,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-200 dark:bg-gray-900 text-slate-900 dark:text-white transition-all duration-300 font-sans">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-200 text-slate-900 transition-all duration-300 font-sans">
       {/* Sidebar - Desktop Only */}
-      <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
+      <aside className="hidden md:flex w-64 bg-gray-200 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
           <Link to="/" className="flex items-center">
             <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
@@ -290,16 +295,16 @@ const Dashboard = () => {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-white shadow-none'
+                ? 'bg-indigo-100 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
+                : 'bg-gray-100 text-gray-700 hover:bg-white shadow-none'
                 }`}
             >
-              <item.icon size={18} className={activeTab === item.id ? 'text-indigo-600' : 'text-gray-500 dark:text-gray-400'} />
+              <item.icon size={18} className={activeTab === item.id ? 'text-indigo-600' : 'text-gray-500'} />
               {item.label}
             </button>
           ))}
         </nav>
-        <div className="pt-6 border-t border-slate-100 dark:border-white/5">
+        <div className="pt-6 border-t border-slate-100">
           <Link
             to="/signin"
             onClick={() => localStorage.removeItem("user")}
@@ -312,7 +317,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Mobile Header - Full menu accessibility */}
-      <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+      <div className="md:hidden sticky top-0 z-50 bg-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
           <Link to="/" className="flex items-center">
             <img src={logo} alt="Local Service Agency" className="h-8 object-contain" />
@@ -326,7 +331,7 @@ const Dashboard = () => {
               onClick={() => setActiveTab(item.id)}
               className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${activeTab === item.id
                 ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
-                : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
+                : 'text-slate-500 bg-slate-100'
                 }`}
             >
               {item.label}
@@ -336,34 +341,34 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-gray-200 dark:bg-gray-900 transition-all duration-300">
-        <div className="p-6 max-w-7xl mx-auto">
+      <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-200 transition-all duration-300">
+        <div className="p-6 max-w-7xl mx-auto w-full flex flex-col h-full">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-500 transition-colors mb-6 group shrink-0"
           >
             <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             <span>Back to Home</span>
           </Link>
-          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+              <h1 className="text-xl md:text-2xl font-bold text-slate-900">
                 {menuItems.find(m => m.id === activeTab)?.label}
               </h1>
-              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">Track your service requests and manage your account.</p>
+              <p className="text-xs md:text-sm text-slate-500 mt-1">Track your service requests and manage your account.</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">John Customer</p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Premium Member</p>
+                <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name || 'Customer'}</p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{user?.role || 'User'}</p>
               </div>
               <div className="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
-                JC
+                {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
               </div>
             </div>
           </header>
 
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-500 p-6">
             {renderContent()}
           </div>
         </div>

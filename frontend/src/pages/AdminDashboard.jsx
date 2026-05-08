@@ -16,22 +16,31 @@ import {
   LogOut,
   ChevronLeft,
   Wrench,
-  User
+  User,
+  Eye,
+  Trash2,
+  X
 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [workers, setWorkers] = useState([
-    { id: 1, name: 'Ali', skill: 'Electrician' },
-    { id: 2, name: 'Ahmed', skill: 'Plumber' },
-    { id: 3, name: 'Khan', skill: 'Mechanic' }
-  ]);
+  const [workers, setWorkers] = useState([]);
 
   useEffect(() => {
     fetchRequests();
+    fetchWorkers();
   }, []);
+
+  const fetchWorkers = async () => {
+    try {
+      const { data } = await api.get('/workers');
+      setWorkers(data);
+    } catch (error) {
+      console.error('Error fetching workers:', error);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -48,27 +57,33 @@ const AdminDashboard = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await api.put(`/requests/${id}/status`, { status });
-      alert('Status updated successfully');
-      fetchRequests();
+      const { data } = await api.put(`/requests/${id}/status`, { status });
+      // Update local state instantly with returned data
+      setRequests(prev => prev.map(req => (req._id === id || req.id === id) ? data : req));
+      console.log('Status updated to:', status);
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to update status');
+      fetchRequests(); // Revert on error
     }
   };
 
   const assignWorker = async (id, workerName) => {
     try {
-      await api.put(`/requests/${id}/assign`, { workerName });
-      alert('Worker assigned successfully');
-      fetchRequests();
+      const { data } = await api.put(`/requests/${id}/assign`, { workerName });
+      setRequests(prev => prev.map(req => (req._id === id || req.id === id) ? data : req));
+      console.log('Worker assigned:', workerName);
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to assign worker');
+      fetchRequests();
     }
   };
 
   const [workerForm, setWorkerForm] = useState({
     name: '',
+    address: '',
+    phone: '',
     skill: '',
+    age: '',
     availability: 'Available'
   });
 
@@ -80,12 +95,40 @@ const AdminDashboard = () => {
     { id: 'analytics', label: 'Analytics', icon: BarChart },
   ];
 
-  const handleAddWorker = (e) => {
+  const handleAddWorker = async (e) => {
     e.preventDefault();
-    if (!workerForm.name || !workerForm.skill) return alert('Please fill all fields');
-    addWorker(workerForm);
-    setWorkerForm({ name: '', skill: '', availability: 'Available' });
-    alert('Worker added successfully!');
+    if (!workerForm.name || !workerForm.skill || !workerForm.phone || !workerForm.address || !workerForm.age) {
+      return alert('Please fill all fields');
+    }
+
+    try {
+      const { data } = await api.post('/workers', workerForm);
+      setWorkers([...workers, data]);
+      setWorkerForm({
+        name: '',
+        address: '',
+        phone: '',
+        skill: '',
+        age: '',
+        availability: 'Available'
+      });
+      alert('Worker added successfully!');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to add worker');
+    }
+  };
+
+  const [selectedWorker, setSelectedWorker] = useState(null);
+
+  const handleDeleteWorker = async (id) => {
+    if (window.confirm("Are you sure you want to delete this worker?")) {
+      try {
+        await api.delete(`/workers/${id}`);
+        setWorkers(workers.filter(w => (w._id || w.id) !== id));
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to delete worker');
+      }
+    }
   };
 
   // Dynamic Stats
@@ -105,11 +148,11 @@ const AdminDashboard = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, idx) => (
-                <div key={idx} className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
+                <div key={idx} className="bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] flex justify-between items-center gap-4 transition-all duration-300 hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)]">
                   <div>
                     <p className="text-xs uppercase text-gray-500 tracking-wide font-bold mb-1">{stat.label}</p>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
-                    <span className="text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
+                    <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+                    <span className="text-green-600 bg-green-100 text-xs px-2 py-1 rounded-full mt-2 inline-block font-bold">
                       +12.5%
                     </span>
                   </div>
@@ -123,9 +166,9 @@ const AdminDashboard = () => {
             {/* Analytics & Customers Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Performance Overview */}
-              <div className="lg:col-span-2 bg-gray-200 dark:bg-gray-800 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+              <div className="lg:col-span-2 bg-gray-200 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
                 <div className="flex justify-between items-center mb-10">
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Performance Overview</h3>
+                  <h3 className="text-2xl font-bold text-gray-800">Performance Overview</h3>
                   <div className="flex items-center gap-2">
                     <button className="px-4 py-1.5 text-sm font-semibold bg-gray-200 text-gray-700 rounded-full">Weekly</button>
                     <button className="px-4 py-1.5 text-sm font-semibold bg-blue-500 text-white rounded-full">Monthly</button>
@@ -153,8 +196,8 @@ const AdminDashboard = () => {
 
               {/* Right Column: Recent Customers & Weekly Goal */}
               <div className="flex flex-col gap-6">
-                <div className="bg-gray-200 dark:bg-gray-800 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Recent Customers</h3>
+                <div className="bg-gray-200 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+                  <h3 className="text-lg font-bold text-gray-900 mb-6">Recent Customers</h3>
                   <div className="space-y-6">
                     {[
                       { name: 'Sarah Jenkins', time: '2 min ago', amount: '+$240', color: 'from-pink-500 to-rose-500' },
@@ -167,7 +210,7 @@ const AdminDashboard = () => {
                             {customer.name.split(' ').map(n => n[0]).join('')}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">{customer.name}</p>
+                            <p className="text-sm font-bold text-gray-900">{customer.name}</p>
                             <p className="text-[10px] text-gray-500">{customer.time}</p>
                           </div>
                         </div>
@@ -176,7 +219,7 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                   <div className="mt-8 text-center">
-                    <button className="text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                    <button className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">
                       View All Transactions
                     </button>
                   </div>
@@ -202,11 +245,11 @@ const AdminDashboard = () => {
         );
       case 'requests':
         return (
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300 overflow-hidden">
+          <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300">
             {requests.length > 0 ? (
               <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-700/50">
+                  <tr className="bg-gray-50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Customer</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
@@ -216,17 +259,17 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody className="space-y-2">
                   {requests.map((req) => (
-                    <tr key={req._id || req.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <tr key={req._id || req.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <User size={16} className="text-gray-400" />
                           <div>
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">{req.user?.name || "Unknown User"}</p>
-                            <p className="text-[10px] text-slate-500">{req.date}</p>
+                            <p className="text-sm font-medium text-slate-900">{req.user?.name || "Unknown User"}</p>
+                            <p className="text-[10px] text-slate-500">{new Date(req.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <Wrench size={14} className="text-gray-400" />
                           {req.serviceType}
@@ -235,16 +278,14 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4">
                         <select
                           value={req.status}
-                          disabled={req.status === 'Completed'}
-                          onChange={(e) => {
-                            updateStatus(req.id, e.target.value);
-                            alert('Status updated successfully');
-                          }}
-                          className={`bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg text-[10px] font-bold px-2 py-1 outline-none ${req.status === 'Completed' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={req.status === 'Completed' || req.status === 'Cancelled'}
+                          onChange={(e) => updateStatus(req._id || req.id, e.target.value)}
+                          className={`bg-gray-50 shadow-sm rounded-lg text-[10px] font-bold px-2 py-1 outline-none ${(req.status === 'Completed' || req.status === 'Cancelled') ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <option value="Pending">Pending</option>
                           <option value="In Progress">In Progress</option>
                           <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 text-xs font-medium text-slate-500">
@@ -253,16 +294,13 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <select
-                            className="bg-gray-50 dark:bg-gray-700 shadow-sm rounded-lg text-[10px] px-2 py-1 outline-none"
-                            onChange={(e) => {
-                              assignWorker(req.id, e.target.value);
-                              alert('Worker assigned successfully');
-                            }}
+                            className="bg-gray-50 shadow-sm rounded-lg text-[10px] px-2 py-1 outline-none"
+                            onChange={(e) => assignWorker(req._id || req.id, e.target.value)}
                             value={req.assignedWorker || ""}
-                            disabled={req.status === 'Completed'}
+                            disabled={req.status === 'Completed' || req.status === 'Cancelled'}
                           >
                             <option value="">Select Worker</option>
-                            {workers.map(w => <option key={w.id} value={w.name}>{w.name} ({w.skill})</option>)}
+                            {workers.map(w => <option key={w._id || w.id} value={w.name}>{w.name} ({w.skill})</option>)}
                           </select>
                         </div>
                       </td>
@@ -272,7 +310,7 @@ const AdminDashboard = () => {
               </table>
             ) : (
               <div className="p-20 text-center">
-                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">No service requests yet</p>
+                <p className="text-slate-500 font-medium text-sm">No service requests yet</p>
               </div>
             )}
           </div>
@@ -281,17 +319,17 @@ const AdminDashboard = () => {
         return (
           <div className="space-y-6">
             {/* Add Worker Form */}
-            <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
-              <h3 className="text-sm font-bold mb-4 uppercase tracking-widest text-indigo-500">Add New Worker</h3>
-              <form onSubmit={handleAddWorker} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="max-w-2xl bg-gray-200 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+              <h3 className="text-sm font-bold mb-5 uppercase tracking-widest text-indigo-500">Add New Worker</h3>
+              <form onSubmit={handleAddWorker} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-end">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Name</label>
                   <input
                     type="text"
                     value={workerForm.name}
                     onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
-                    placeholder="Worker Name"
-                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-xs"
+                    placeholder="Full Name"
+                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   />
                 </div>
                 <div>
@@ -299,7 +337,7 @@ const AdminDashboard = () => {
                   <select
                     value={workerForm.skill}
                     onChange={(e) => setWorkerForm({ ...workerForm, skill: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none text-xs"
+                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
                   >
                     <option value="">Select Skill</option>
                     <option value="Electrician">Electrician</option>
@@ -309,30 +347,61 @@ const AdminDashboard = () => {
                     <option value="Cleaner">Cleaner</option>
                   </select>
                 </div>
-                <button type="submit" className="bg-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={workerForm.phone}
+                    onChange={(e) => setWorkerForm({ ...workerForm, phone: e.target.value })}
+                    placeholder="Phone Number"
+                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Age</label>
+                  <input
+                    type="number"
+                    value={workerForm.age}
+                    onChange={(e) => setWorkerForm({ ...workerForm, age: e.target.value })}
+                    placeholder="Age"
+                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 ml-1">Address</label>
+                  <input
+                    type="text"
+                    value={workerForm.address}
+                    onChange={(e) => setWorkerForm({ ...workerForm, address: e.target.value })}
+                    placeholder="Worker Address"
+                    className="w-full px-4 py-2.5 bg-gray-100 shadow-sm rounded-xl outline-none text-xs border border-transparent focus:border-indigo-500/30 transition-all"
+                  />
+                </div>
+                <button type="submit" className="bg-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs h-[42px]">
                   Add Worker
                 </button>
               </form>
             </div>
 
             {/* Workers List */}
-            <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] p-5 transition-all duration-300 overflow-hidden">
+            <div className="bg-gray-200 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] p-5 transition-all duration-300 overflow-hidden">
               <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="bg-gray-200 dark:bg-gray-700/50">
+                  <tr className="bg-gray-200">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Worker Name</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Skill</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Availability</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
                   {workers.map((worker) => (
-                    <tr key={worker.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white flex items-center gap-2">
+                    <tr key={worker._id || worker.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900 flex items-center gap-2">
                         <User size={16} className="text-gray-400" />
                         {worker.name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex items-center gap-2">
                           <Wrench size={14} className="text-gray-400" />
                           {worker.skill}
@@ -345,6 +414,24 @@ const AdminDashboard = () => {
                           {worker.availability}
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => setSelectedWorker(worker)}
+                            className="p-2 bg-gray-200 text-indigo-500 rounded-xl shadow-[-2px_-2px_5px_rgba(255,255,255,0.8),2px_2px_5px_rgba(0,0,0,0.1)] hover:shadow-inner transition-all duration-200"
+                            title="View Details"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteWorker(worker._id || worker.id)}
+                            className="p-2 bg-gray-200 text-red-500 rounded-xl shadow-[-2px_-2px_5px_rgba(255,255,255,0.8),2px_2px_5px_rgba(0,0,0,0.1)] hover:shadow-inner transition-all duration-200"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -354,19 +441,19 @@ const AdminDashboard = () => {
         );
       case 'assign':
         return (
-          <div className="max-w-xl bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+          <div className="max-w-xl bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
             <h3 className="text-lg font-bold mb-6">Assign New Job</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-2">Select Request</label>
-                <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
+                <select className="w-full p-3 bg-gray-50 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
                   <option>John Doe - Electrical (Pending)</option>
                   <option>Sarah Wilson - Painting (Pending)</option>
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-2">Select Worker</label>
-                <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
+                <select className="w-full p-3 bg-gray-50 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm">
                   <option>Robert Fox (Electrician)</option>
                   <option>Jenny Wilson (Cleaner)</option>
                   <option>Albert Flores (Painter)</option>
@@ -381,19 +468,19 @@ const AdminDashboard = () => {
       case 'analytics':
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
               <p className="text-sm text-gray-500 font-medium mb-1">Total Earnings</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$12,450.00</h3>
+              <h3 className="text-2xl font-bold text-slate-900">$12,450.00</h3>
               <p className="text-xs text-green-500 mt-2 font-medium">↑ 12% from last month</p>
             </div>
-            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
               <p className="text-sm text-gray-500 font-medium mb-1">Jobs Completed</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">842</h3>
+              <h3 className="text-2xl font-bold text-slate-900">842</h3>
               <p className="text-xs text-gray-500 mt-2 font-medium">Average 28 jobs / week</p>
             </div>
-            <div className="bg-gray-200 dark:bg-gray-800 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="bg-gray-200 p-5 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] hover:shadow-[-4px_-4px_10px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300">
               <p className="text-sm text-gray-500 font-medium mb-1">Worker Performance</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">94%</h3>
+              <h3 className="text-2xl font-bold text-slate-900">94%</h3>
               <p className="text-xs text-green-500 mt-2 font-medium">Customer satisfaction rate</p>
             </div>
           </div>
@@ -404,9 +491,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-200 dark:bg-gray-900 text-slate-900 dark:text-white transition-all duration-300 font-sans">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-200 text-slate-900 transition-all duration-300 font-sans">
       {/* Sidebar - Desktop Only */}
-      <aside className="hidden md:flex w-64 bg-gray-200 dark:bg-gray-800 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
+      <aside className="hidden md:flex w-64 bg-gray-200 shadow-[4px_0_12px_rgba(0,0,0,0.05)] rounded-r-2xl p-6 flex-col shrink-0 transition-all duration-300">
         <div className="mb-10">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
@@ -419,11 +506,11 @@ const AdminDashboard = () => {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-semibold ${activeTab === item.id
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-white shadow-none'
+                ? 'bg-indigo-100 text-indigo-600 shadow-[inset_-3px_-3px_6px_rgba(255,255,255,0.7),inset_3px_3px_6px_rgba(0,0,0,0.1)]'
+                : 'bg-gray-100 text-gray-700 hover:bg-white shadow-none'
                 }`}
             >
-              <item.icon size={18} className={activeTab === item.id ? 'text-indigo-600' : 'text-gray-500 dark:text-gray-400'} />
+              <item.icon size={18} className={activeTab === item.id ? 'text-indigo-600' : 'text-gray-500'} />
               {item.label}
             </button>
           ))}
@@ -441,7 +528,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden sticky top-0 z-50 bg-gray-200 dark:bg-gray-800 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+      <div className="md:hidden sticky top-0 z-50 bg-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between p-4 pb-2">
           <Link to="/" className="flex items-center gap-1">
             <img src={logo} alt="Local Service Agency" className="h-8 object-contain" />
@@ -456,7 +543,7 @@ const AdminDashboard = () => {
               onClick={() => setActiveTab(item.id)}
               className={`px-4 py-1.5 text-[10px] font-bold rounded-full whitespace-nowrap transition-all ${activeTab === item.id
                 ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
-                : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5'
+                : 'text-slate-500 bg-slate-100'
                 }`}
             >
               {item.label}
@@ -466,25 +553,25 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-gray-200 dark:bg-gray-900 transition-all duration-300">
-        <div className="p-6 max-w-7xl mx-auto">
+      <main className="flex-1 flex flex-col h-full overflow-hidden bg-gray-200 transition-all duration-300">
+        <div className="p-6 max-w-7xl mx-auto w-full flex flex-col h-full">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-500 transition-colors mb-6 group shrink-0"
           >
             <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             <span>Back to Home</span>
           </Link>
-          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+              <h1 className="text-xl md:text-2xl font-bold text-slate-900">
                 {menuItems.find(m => m.id === activeTab)?.label}
               </h1>
-              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your agency operations and workers.</p>
+              <p className="text-xs md:text-sm text-slate-500 mt-1">Manage your agency operations and workers.</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Admin User</p>
+                <p className="text-sm font-bold text-slate-900 leading-tight">Admin User</p>
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Manager</p>
               </div>
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
@@ -493,10 +580,61 @@ const AdminDashboard = () => {
             </div>
           </header>
 
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-500 p-6">
             {renderContent()}
           </div>
         </div>
+
+        {/* Worker Details Modal */}
+        {selectedWorker && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-gray-200 w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative animate-in zoom-in-95 duration-300">
+              <button
+                onClick={() => setSelectedWorker(null)}
+                className="absolute top-5 right-5 p-1.5 bg-gray-200 text-gray-500 hover:text-red-500 rounded-xl shadow-[-2px_-2px_5px_rgba(255,255,255,0.8),2px_2px_5px_rgba(0,0,0,0.1)] transition-all"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-indigo-500/20 mb-3">
+                  {selectedWorker.name.charAt(0)}
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">{selectedWorker.name}</h2>
+                <p className="text-indigo-500 font-bold text-xs uppercase tracking-widest mt-0.5">{selectedWorker.skill}</p>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="bg-gray-200 p-3 rounded-2xl shadow-[inset_-2px_-2px_5px_rgba(255,255,255,0.8),inset_2px_2px_5px_rgba(0,0,0,0.1)]">
+                  <p className="text-[9px] font-bold uppercase text-gray-500 mb-0.5">Phone Number</p>
+                  <p className="text-xs font-semibold text-gray-900">{selectedWorker.phone || "Not Provided"}</p>
+                </div>
+                <div className="bg-gray-200 p-3 rounded-2xl shadow-[inset_-2px_-2px_5px_rgba(255,255,255,0.8),inset_2px_2px_5px_rgba(0,0,0,0.1)]">
+                  <p className="text-[9px] font-bold uppercase text-gray-500 mb-0.5">Age</p>
+                  <p className="text-xs font-semibold text-gray-900">{selectedWorker.age ? `${selectedWorker.age} years` : "Not Provided"}</p>
+                </div>
+                <div className="bg-gray-200 p-3 rounded-2xl shadow-[inset_-2px_-2px_5px_rgba(255,255,255,0.8),inset_2px_2px_5px_rgba(0,0,0,0.1)]">
+                  <p className="text-[9px] font-bold uppercase text-gray-500 mb-0.5">Address</p>
+                  <p className="text-xs font-semibold text-gray-900 leading-relaxed">{selectedWorker.address || "Not Provided"}</p>
+                </div>
+                <div className="bg-gray-200 p-3 rounded-2xl shadow-[inset_-2px_-2px_5px_rgba(255,255,255,0.8),inset_2px_2px_5px_rgba(0,0,0,0.1)]">
+                  <p className="text-[9px] font-bold uppercase text-gray-500 mb-0.5">Current Status</p>
+                  <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${selectedWorker.availability === 'Available' ? 'text-green-500' : 'text-amber-500'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${selectedWorker.availability === 'Available' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                    {selectedWorker.availability}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedWorker(null)}
+                className="w-full mt-6 py-3 bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all active:scale-[0.98] text-sm"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

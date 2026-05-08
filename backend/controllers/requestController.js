@@ -41,6 +41,7 @@ const getUserRequests = async (req, res) => {
 // @access  Private/Admin
 const getAllRequests = async (req, res) => {
   const requests = await ServiceRequest.find({}).populate('user', 'name email').sort('-createdAt');
+  console.log(requests);
   res.json(requests);
 };
 

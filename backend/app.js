@@ -14,6 +14,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/requests', require('./routes/requestRoutes'));
+app.use('/api/workers', require('./routes/workerRoutes'));
 
 // Root Route
 app.get('/', (req, res) => {
