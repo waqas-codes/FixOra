@@ -24,11 +24,19 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [reviewData, setReviewData] = useState({ id: null, rating: 5, comment: '' });
+  const [profileForm, setProfileForm] = useState({ name: '', email: '', phone: '' });
+  const [updateMessage, setUpdateMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setProfileForm({
+        name: parsedUser.name || '',
+        email: parsedUser.email || '',
+        phone: parsedUser.phone || '',
+      });
     }
     fetchRequests();
   }, []);
@@ -38,7 +46,7 @@ const Dashboard = () => {
       setLoading(true);
       const { data } = await api.get('/requests/my');
       setRequests(data);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.error('Error fetching requests:', error);
     } finally {
@@ -67,6 +75,31 @@ const Dashboard = () => {
       fetchRequests();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to submit review');
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setUpdateMessage({ type: '', text: '' });
+    
+    if (!profileForm.name || !profileForm.email) {
+      return setUpdateMessage({ type: 'error', text: 'Name and email are required' });
+    }
+    if (!/^\S+@\S+\.\S+$/.test(profileForm.email)) {
+      return setUpdateMessage({ type: 'error', text: 'Please enter a valid email' });
+    }
+
+    try {
+      const { data } = await api.put('/users/profile', profileForm);
+      localStorage.setItem('user', JSON.stringify(data));
+      setUser(data);
+      setUpdateMessage({ type: 'success', text: 'Profile updated successfully' });
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateMessage({ type: '', text: '' }), 3000);
+    } catch (error) {
+      console.error(error);
+      setUpdateMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile' });
     }
   };
 
@@ -99,7 +132,7 @@ const Dashboard = () => {
           </div>
         );
       case 'requests':
-        console.log('Rendering requests:', requests);
+        // console.log('Rendering requests:', requests);
         return (
           <div className="bg-gray-200 rounded-2xl shadow-[inset_-4px_-4px_8px_rgba(255,255,255,0.7),inset_4px_4px_8px_rgba(0,0,0,0.1)] p-6 transition-all duration-300">
             {requests.length > 0 ? (
@@ -247,32 +280,44 @@ const Dashboard = () => {
         return (
           <div className="max-w-xl bg-gray-200 p-6 rounded-2xl shadow-[-6px_-6px_12px_rgba(255,255,255,0.9),6px_6px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
             <h3 className="text-lg font-bold mb-6 text-slate-900">Profile Information</h3>
-            <form className="space-y-4">
+            
+            {updateMessage.text && (
+              <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                {updateMessage.text}
+              </div>
+            )}
+
+            <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Full Name</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Full Name <span className="text-red-500">*</span></label>
                 <input
                   type="text"
-                  defaultValue="John Customer"
+                  value={profileForm.name}
+                  onChange={(e) => setProfileForm({...profileForm, name: e.target.value})}
                   className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
+                  required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Email Address</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Email Address <span className="text-red-500">*</span></label>
                 <input
                   type="email"
-                  defaultValue="john@example.com"
+                  value={profileForm.email}
+                  onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
                   className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
+                  required
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1.5 ml-1">Phone Number</label>
                 <input
                   type="tel"
-                  defaultValue="+1 (555) 000-0000"
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
                   className="w-full px-4 py-2.5 bg-gray-50 shadow-sm rounded-xl outline-none text-sm"
                 />
               </div>
-              <button className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:shadow-md transition-all duration-200 shadow-sm">
+              <button type="submit" className="w-full py-3 mt-4 bg-indigo-500 text-white font-bold rounded-xl hover:shadow-md transition-all duration-200 shadow-sm">
                 Update Profile
               </button>
             </form>
