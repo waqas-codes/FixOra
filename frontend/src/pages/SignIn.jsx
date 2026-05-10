@@ -18,7 +18,7 @@ const SignIn = () => {
 
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      
+
       // Role validation
       if (data.role !== role) {
         return setError('Unauthorized user');
@@ -43,14 +43,14 @@ const SignIn = () => {
       <div className="w-full max-w-md bg-white dark:bg-[#151c2c] rounded-[1.5rem] p-6 md:p-8 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-white/5">
         <Link
           to="/"
-          className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group w-fit"
+          className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors mb-6 group w-fit lg:absolute lg:top-8 lg:left-8 lg:mb-0"
         >
           <span className="transition-transform group-hover:-translate-x-1">←</span>
           <span>Back to Home</span>
         </Link>
         {/* Header */}
         <div className="text-center mb-6">
-          <Link to="/" className="inline-block mb-4">
+          <Link to="/" className="inline-block mb-4 lg:hidden">
             <img src={logo} alt="Local Service Agency" className="h-10 object-contain" />
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Welcome Back</h1>
@@ -86,7 +86,7 @@ const SignIn = () => {
               </span>
               <input
                 type="email"
-                placeholder="name@company.com"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-all text-sm text-slate-900 dark:text-white"
