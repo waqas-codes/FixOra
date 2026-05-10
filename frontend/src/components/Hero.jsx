@@ -96,7 +96,7 @@ const Hero = () => {
     <section ref={sectionRef} className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between min-h-[70vh] gap-12 pt-32 px-6 lg:mt-0">
 
       {/* LEFT SIDE */}
-      <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+      <div className="flex-1 flex flex-col items-start md:items-center lg:items-start text-left md:text-center lg:text-left">
         <h1
           ref={headingRef}
           className="text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight tracking-tight text-gray-900 dark:text-white"

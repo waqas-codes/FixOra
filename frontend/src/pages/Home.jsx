@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Sun, Moon } from 'lucide-react';
 import logo from '../assets/logo.png';
 import Hero from '../components/Hero';
 import Services from '../components/Services';
@@ -63,10 +64,10 @@ function Navbar() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsDark(!isDark)}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow-md transition-all duration-300"
             aria-label="Toggle Dark Mode"
           >
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           {token ? (
             <button
