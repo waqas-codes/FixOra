@@ -65,7 +65,7 @@ const SignUp = () => {
           <button
             type="button"
             className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 relative z-10 text-slate-400 dark:text-gray-500 cursor-not-allowed opacity-50"
-            onClick={() => setRole('admin')}
+            disable
             title="Admin registration is restricted"
           >
             Admin
