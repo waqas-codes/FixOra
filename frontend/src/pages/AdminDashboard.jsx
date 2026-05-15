@@ -196,41 +196,41 @@ const AdminDashboard = () => {
             </div>
 
             {/* Analytics & Customers Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Performance Overview */}
-              <div className="lg:col-span-2 bg-gray-200 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
-                <div className="flex justify-between items-center mb-10">
-                  <h3 className="text-2xl font-bold text-gray-800">Performance Overview</h3>
+              <div className="lg:col-span-2 bg-gray-200 rounded-2xl p-5 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-800">Performance Overview</h3>
                   <div className="flex items-center gap-2">
-                    <button className="px-4 py-1.5 text-sm font-semibold bg-gray-200 text-gray-700 rounded-full">Weekly</button>
-                    <button className="px-4 py-1.5 text-sm font-semibold bg-blue-500 text-white rounded-full">Monthly</button>
+                    <button className="px-3 py-1 text-xs font-semibold bg-blue-500 text-white rounded-full">Weekly</button>
+                    <button className="px-3 py-1 text-xs font-semibold bg-gray-200 text-gray-700  rounded-full">Monthly</button>
                   </div>
                 </div>
 
-                <div className="flex items-end justify-between h-72 px-4 pb-2">
+                <div className="flex items-end justify-between h-40 px-2 pb-1">
                   {[
-                    { day: 'MON', height: 'h-28', color: 'bg-indigo-200' },
-                    { day: 'TUE', height: 'h-40', color: 'bg-indigo-200' },
-                    { day: 'WED', height: 'h-36', color: 'bg-indigo-200' },
-                    { day: 'THU', height: 'h-56', color: 'bg-blue-500', active: true },
-                    { day: 'FRI', height: 'h-30', color: 'bg-indigo-200' },
-                    { day: 'SAT', height: 'h-44', color: 'bg-indigo-200' }
+                    { day: 'MON', height: 'h-16', color: 'bg-indigo-200' },
+                    { day: 'TUE', height: 'h-24', color: 'bg-indigo-200' },
+                    { day: 'WED', height: 'h-20', color: 'bg-indigo-200' },
+                    { day: 'THU', height: 'h-32', color: 'bg-blue-500', active: true },
+                    { day: 'FRI', height: 'h-16', color: 'bg-indigo-200' },
+                    { day: 'SAT', height: 'h-28', color: 'bg-indigo-200' }
                   ].map((item, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-3 w-full">
+                    <div key={idx} className="flex flex-col items-center gap-2 w-full">
                       <div
-                        className={`w-14 ${item.height} ${item.color} rounded-t-2xl transition-all duration-300`}
+                        className={`w-10 ${item.height} ${item.color} rounded-t-xl transition-all duration-300`}
                       ></div>
-                      <span className="text-xs font-bold uppercase text-gray-400">{item.day}</span>
+                      <span className="text-[10px] font-bold uppercase text-gray-400">{item.day}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Right Column: Recent Customers & Weekly Goal */}
-              <div className="flex flex-col gap-6">
-                <div className="bg-gray-200 rounded-3xl p-6 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6">Recent Customers</h3>
-                  <div className="space-y-6">
+              <div className="flex flex-col gap-4">
+                <div className="bg-gray-200 rounded-2xl p-5 shadow-[inset_-6px_-6px_12px_rgba(255,255,255,0.9),inset_6px_6px_12px_rgba(0,0,0,0.1)]">
+                  <h3 className="text-base font-bold text-gray-900 mb-4">Recent Customers</h3>
+                  <div className="space-y-4">
                     {[
                       { name: 'Sarah Jenkins', time: '2 min ago', amount: '+$240', color: 'from-pink-500 to-rose-500' },
                       { name: 'Michael Chen', time: '15 min ago', amount: '+$180', color: 'from-blue-500 to-cyan-500' },
@@ -238,39 +238,39 @@ const AdminDashboard = () => {
                     ].map((customer, idx) => (
                       <div key={idx} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${customer.color} flex items-center justify-center text-white text-xs font-bold`}>
+                          <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${customer.color} flex items-center justify-center text-white text-[10px] font-bold`}>
                             {customer.name.split(' ').map(n => n[0]).join('')}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-gray-900">{customer.name}</p>
-                            <p className="text-[10px] text-gray-500">{customer.time}</p>
+                            <p className="text-xs font-bold text-gray-900">{customer.name}</p>
+                            <p className="text-[9px] text-gray-500">{customer.time}</p>
                           </div>
                         </div>
-                        <span className="text-sm font-bold text-green-600">{customer.amount}</span>
+                        <span className="text-xs font-bold text-green-600">{customer.amount}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-8 text-center">
-                    <button className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">
+                  <div className="mt-4 text-center">
+                    <button className="text-[10px] font-bold text-gray-400 hover:text-gray-600 transition-colors">
                       View All Transactions
                     </button>
                   </div>
                 </div>
 
                 {/* Weekly Goal Card */}
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20">
-                  <h3 className="text-lg font-bold mb-1">Weekly Goal</h3>
-                  <p className="text-xs text-blue-100 mb-6">Target: 100 requests completed</p>
-                  <div className="space-y-2">
+                {/* <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-xl shadow-blue-500/20">
+                  <h3 className="text-base font-bold mb-1">Weekly Goal</h3>
+                  <p className="text-[10px] text-blue-100 mb-4">Target: 100 requests completed</p>
+                  <div className="space-y-1.5">
                     <div className="flex justify-between items-end">
-                      <span className="text-2xl font-bold">75%</span>
-                      <span className="text-[10px] font-bold text-blue-100">75/100</span>
+                      <span className="text-lg font-bold">75%</span>
+                      <span className="text-[9px] font-bold text-blue-100">75/100</span>
                     </div>
-                    <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
                       <div className="h-full bg-white rounded-full" style={{ width: '75%' }}></div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
