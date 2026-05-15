@@ -38,7 +38,7 @@ function Navbar() {
 
   return (
     <nav className="fixed w-full top-0 z-50 p-4">
-      <div className="max-w-7xl mx-auto glass rounded-2xl px-6 py-4 flex items-center justify-between">
+      <div className="bg-blue-900 max-w-7xl mx-auto glass rounded-2xl px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img src={logo} alt="Local Service Agency" className="h-12 md:h-14 object-contain" />
         </Link>
